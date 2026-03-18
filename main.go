@@ -1,32 +1,47 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
+
+	"Go_dev_diplom/pkg/db" // импортируем наш пакет
 )
 
 func main() {
-	// Определяем порт
+	// --- Настройка базы данных ---
+
+	// Определяем путь к файлу БД
+	// Приоритет: переменная окружения > значение по умолчанию
+	dbFile := os.Getenv("TODO_DBFILE")
+	if dbFile == "" {
+		dbFile = "scheduler.db" // значение по умолчанию
+	}
+
+	// Инициализируем БД
+	// Важно: db.Init создаёт глобальную переменную db.DB
+	if err := db.Init(dbFile); err != nil {
+		log.Fatalf("Ошибка инициализации БД: %v", err)
+	}
+
+	// Гарантированно закрываем БД при завершении программы
+	defer db.Close()
+
+	log.Printf("База данных %s готова к работе", dbFile)
+
+	// --- Настройка веб-сервера ---
+
 	port := os.Getenv("TODO_PORT")
 	if port == "" {
 		port = "7540"
 	}
 
-	// Директория с веб-файлами
 	webDir := "./web"
-
-	// Создаем файловый сервер
 	fileServer := http.FileServer(http.Dir(webDir))
-
-	// Регистрируем обработчик для корневого пути
 	http.Handle("/", fileServer)
 
-	// Запускаем сервер
-	fmt.Printf("Сервер запущен на порту %s\n", port)
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
+	log.Printf("Сервер запущен на порту %s", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal(err)
 	}
 }
