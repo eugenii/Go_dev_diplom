@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"Go_dev_diplom/pkg/db" // импортируем наш пакет
+	"Go_dev_diplom/pkg/api" // импортируем наш пакет api
+	"Go_dev_diplom/pkg/db"  // импортируем наш пакет
 )
 
 func main() {
@@ -28,6 +29,10 @@ func main() {
 	defer db.Close()
 
 	log.Printf("База данных %s готова к работе", dbFile)
+
+	// --- Инициализация API обработчиков ---
+	api.Init() // <-- ВАЖНО: регистрируем все API до запуска сервера
+	log.Println("API обработчики зарегистрированы")
 
 	// --- Настройка веб-сервера ---
 
