@@ -252,10 +252,10 @@ func lastDayOfMonth(t time.Time) int {
 	return lastOfMonth.Day()
 }
 
-// afterNow проверяет, что дата date больше или равна now
-func afterNow(date time.Time, now time.Time) bool {
-	// Приводим обе даты к одному формату (без времени)
-	d := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
-	n := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-	return d.After(n) || d.Equal(n)
-}
+// // afterNow проверяет, что дата date больше или равна now
+// func afterNow(date time.Time, now time.Time) bool {
+// 	// Приводим обе даты к одному формату (без времени)
+// 	d := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+// 	n := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+// 	return d.After(n) || d.Equal(n)
+// }
