@@ -1,6 +1,7 @@
 package api
 
 import (
+	"Go_dev_diplom/pkg/auth"
 	"log"
 	"net/http"
 )
@@ -11,20 +12,24 @@ const DateFormat = "20060102"
 func Init() {
 	log.Println("Регистрируем обработчики API...")
 
-	// Обработчик для /api/nextdate
+	// Обработчик для /api/signin (без аутентификации)
+	http.HandleFunc("/api/signin", signinHandler)
+	log.Println("  /api/signin зарегистрирован")
+
+	// /api/nextdate - без аутентификации (используется тестами и для вычислений)
 	http.HandleFunc("/api/nextdate", NextDateHandler)
 	log.Println("  /api/nextdate зарегистрирован")
 
-	// Обработчик для /api/task (все методы)
-	http.HandleFunc("/api/task", taskHandler)
+	// Обработчик для /api/task (с аутентификацией)
+	http.HandleFunc("/api/task", auth.AuthMiddleware(taskHandler))
 	log.Println("  /api/task зарегистрирован")
 
-	// Обработчик для /api/tasks (GET)
-	http.HandleFunc("/api/tasks", tasksHandler)
+	// Обработчик для /api/tasks (с аутентификацией)
+	http.HandleFunc("/api/tasks", auth.AuthMiddleware(tasksHandler))
 	log.Println("  /api/tasks зарегистрирован")
 
-	// Обработчик для /api/task/done (POST)
-	http.HandleFunc("/api/task/done", doneTaskHandler)
+	// Обработчик для /api/task/done (с аутентификацией)
+	http.HandleFunc("/api/task/done", auth.AuthMiddleware(doneTaskHandler))
 	log.Println("  /api/task/done зарегистрирован")
 }
 

@@ -123,7 +123,7 @@ func handleWeekly(now time.Time, date time.Time, parts []string) (string, error)
 
 	// Парсим дни недели
 	daysStr := strings.Split(parts[1], ",")
-	weekDays := make(map[int]bool)
+	targetDays := make([]int, 0)
 
 	for _, d := range daysStr {
 		day, err := strconv.Atoi(strings.TrimSpace(d))
@@ -133,33 +133,35 @@ func handleWeekly(now time.Time, date time.Time, parts []string) (string, error)
 		if day < 1 || day > 7 {
 			return "", errors.New("дни недели должны быть от 1 до 7")
 		}
-		weekDays[day] = true
+		targetDays = append(targetDays, day)
 	}
 
-	// Начинаем поиск со следующего дня
-	next := date.AddDate(0, 0, 1)
+	// Начинаем поиск с date
+	next := date
 
-	// Ищем ближайший подходящий день
-	for {
-		// В Go Weekday: Sunday = 0, Monday = 1, ..., Saturday = 6
-		// Нам нужно: Monday = 1, ..., Sunday = 7
-		wd := int(next.Weekday())
-		if wd == 0 {
-			wd = 7 // Sunday
+	// Если date в прошлом, начинаем с now
+	if next.Before(now) {
+		next = now
+	}
+
+	// Ищем подходящий день (максимум 400 дней)
+	for i := 0; i < 400; i++ {
+		// Получаем день недели: 1=Пн, 2=Вт, 3=Ср, 4=Чт, 5=Пт, 6=Сб, 7=Вс
+		weekday := int(next.Weekday())
+		if weekday == 0 {
+			weekday = 7 // воскресенье
 		}
 
-		if weekDays[wd] && afterNow(next, now) {
-			break
+		// Проверяем, входит ли день в список
+		for _, d := range targetDays {
+			if weekday == d && next.After(now) {
+				return next.Format(DateFormat), nil
+			}
 		}
 		next = next.AddDate(0, 0, 1)
-
-		// Защита от бесконечного цикла
-		if next.Year() > now.Year()+100 {
-			return "", errors.New("не удалось найти следующую дату")
-		}
 	}
 
-	return next.Format(DateFormat), nil
+	return "", errors.New("не удалось найти следующую дату")
 }
 
 // handleMonthly обрабатывает правило "m дни [месяцы]" - по дням месяца
