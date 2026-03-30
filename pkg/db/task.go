@@ -198,3 +198,51 @@ func UpdateTask(task *Task) error {
 	log.Printf("Задача с ID %s успешно обновлена", task.ID)
 	return nil
 }
+
+// DeleteTask удаляет задачу по ID
+func DeleteTask(id string) error {
+	query := `DELETE FROM scheduler WHERE id = ?`
+
+	result, err := DB.Exec(query, id)
+	if err != nil {
+		log.Printf("Ошибка при удалении задачи: %v", err)
+		return err
+	}
+
+	// Проверяем, была ли удалена запись
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return fmt.Errorf("задача с ID %s не найдена", id)
+	}
+
+	log.Printf("Задача с ID %s успешно удалена", id)
+	return nil
+}
+
+// UpdateTaskDate обновляет только дату задачи (для повторяющихся задач)
+func UpdateTaskDate(id string, newDate string) error {
+	query := `UPDATE scheduler SET date = ? WHERE id = ?`
+
+	result, err := DB.Exec(query, newDate, id)
+	if err != nil {
+		log.Printf("Ошибка при обновлении даты задачи: %v", err)
+		return err
+	}
+
+	// Проверяем, была ли обновлена запись
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return fmt.Errorf("задача с ID %s не найдена", id)
+	}
+
+	log.Printf("Дата задачи с ID %s обновлена на %s", id, newDate)
+	return nil
+}

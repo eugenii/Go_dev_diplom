@@ -22,6 +22,10 @@ func Init() {
 	// Обработчик для /api/tasks (GET)
 	http.HandleFunc("/api/tasks", tasksHandler)
 	log.Println("  /api/tasks зарегистрирован")
+
+	// Обработчик для /api/task/done (POST)
+	http.HandleFunc("/api/task/done", doneTaskHandler)
+	log.Println("  /api/task/done зарегистрирован")
 }
 
 // taskHandler диспетчеризует запросы к /api/task в зависимости от метода
@@ -34,10 +38,11 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 		updateTaskHandler(w, r)
 	case http.MethodDelete:
+		deleteTaskHandler(w, r)
 		// Будет реализовано в шаге 7
-		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write([]byte("Метод DELETE будет реализован позже"))
+		// w.Header().Set("Content-Type", "text/plain")
+		// w.WriteHeader(http.StatusMethodNotAllowed)
+		// w.Write([]byte("Метод DELETE будет реализован позже"))
 	default:
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusMethodNotAllowed)
