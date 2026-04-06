@@ -1,6 +1,6 @@
 module Go_dev_diplom
 
-go 1.25.3
+go 1.25
 
 require (
 	github.com/jmoiron/sqlx v1.4.0
